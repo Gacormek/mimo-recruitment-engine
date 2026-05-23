@@ -1,0 +1,14 @@
+services:
+  recruitment-engine:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./templates:/app/templates
+    environment:
+      - DATABASE_URL=sqlite:///data/recruitment.db
+      - MIMO_API_URL=http://43.153.206.68:20128/v1
+      - MIMO_MODEL=xmtp/mimo-v2.5-pro
+      - MIMO_API_KEY=sk-hermes-mimo
+    restart: unless-stopped

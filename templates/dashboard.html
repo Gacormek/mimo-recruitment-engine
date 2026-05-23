@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiMo Recruitment Engine</title>
+<style>
+:root {
+  --bg-primary: #0f1117;
+  --bg-secondary: #161822;
+  --bg-card: #1c1e2e;
+  --bg-hover: #252840;
+  --border: #2a2d42;
+  --text-primary: #e4e6f0;
+  --text-secondary: #8b8fa3;
+  --accent: #6c5ce7;
+  --accent-light: #a29bfe;
+  --success: #00b894;
+  --warning: #fdcb6e;
+  --danger: #e17055;
+  --info: #74b9ff;
+  --gradient: linear-gradient(135deg, #6c5ce7, #a29bfe);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h1 {
+  font-size: 1.4rem;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+.header .status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.tabs {
+  display: flex;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 12px 20px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+.tab.active {
+  color: var(--accent-light);
+  border-bottom-color: var(--accent);
+}
+
+.main { padding: 24px; max-width: 1400px; margin: 0 auto; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.card h3 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.card .meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-success { background: rgba(0,184,148,0.15); color: var(--success); }
+.badge-warning { background: rgba(253,203,110,0.15); color: var(--warning); }
+.badge-info { background: rgba(116,185,255,0.15); color: var(--info); }
+.badge-accent { background: rgba(108,92,231,0.15); color: var(--accent-light); }
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--gradient);
+  color: white;
+}
+
+.btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.btn-outline:hover { border-color: var(--accent); color: var(--accent-light); }
+
+.btn-danger { background: var(--danger); color: white; }
+
+input, select, textarea {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  width: 100%;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input:focus, textarea:focus { border-color: var(--accent); }
+
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.form-group { margin-bottom: 16px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th {
+  background: var(--bg-secondary);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+tr:hover td { background: var(--bg-hover); }
+
+.score-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-primary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.score-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.stat-card .value {
+  font-size: 2rem;
+  font-weight: 700;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stat-card .label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal h2 { margin-bottom: 16px; font-size: 1.2rem; }
+
+.pipeline-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pipeline-step:hover { border-color: var(--accent); background: var(--bg-hover); }
+.pipeline-step .step-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--gradient);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700; color: white;
+  flex-shrink: 0;
+}
+
+.pipeline-step .step-info h4 { font-size: 0.9rem; margin-bottom: 2px; }
+.pipeline-step .step-info p { font-size: 0.75rem; color: var(--text-secondary); }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state .icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
+.empty-state p { font-size: 0.9rem; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--success);
+  color: var(--success);
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  display: none;
+  z-index: 200;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧠 MiMo Recruitment Engine</h1>
+  <div class="status">
+    <span class="status-dot"></span>
+    <span id="ws-status">Connected</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="candidates">Candidates</div>
+  <div class="tab" data-tab="jobs">Jobs</div>
+  <div class="tab" data-tab="pipeline">Pipeline</div>
+  <div class="tab" data-tab="scores">Scores</div>
+  <div class="tab" data-tab="questions">Questions</div>
+  <div class="tab" data-tab="comparisons">Comparisons</div>
+  <div class="tab" data-tab="reports">Reports</div>
+  <div class="tab" data-tab="system">System</div>
+</div>
+
+<div class="main">
+
+  <!-- CANDIDATES TAB -->
+  <div class="tab-content active" id="tab-candidates">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h2>Candidates</h2>
+      <button class="btn btn-primary" onclick="openModal('add-candidate-modal')">+ Add Candidate</button>
+    </div>
+    <div id="candidates-grid" class="grid"></div>
+  </div>
+
+  <!-- JOBS TAB -->
+  <div class="tab-content" id="tab-jobs">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h2>Job Positions</h2>
+      <button class="btn btn-primary" onclick="openModal('add-job-modal')">+ Add Job</button>
+    </div>
+    <div id="jobs-grid" class="grid"></div>
+  </div>
+
+  <!-- PIPELINE TAB -->
+  <div class="tab-content" id="tab-pipeline">
+    <h2 style="margin-bottom:20px;">AI Recruitment Pipeline</h2>
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div class="pipeline-step" onclick="openModal('match-modal')">
+          <div class="step-num">1</div>
+          <div class="step-info"><h4>Match</h4><p>Match candidates to jobs</p></div>
+        </div>
+        <div class="pipeline-step" onclick="openModal('score-modal')">
+          <div class="step-num">2</div>
+          <div class="step-info"><h4>Score</h4><p>AI holistic scoring</p></div>
+        </div>
+        <div class="pipeline-step" onclick="openModal('qgen-modal')">
+          <div class="step-num">3</div>
+          <div class="step-info"><h4>Questions</h4><p>Generate interview questions</p></div>
+        </div>
+        <div class="pipeline-step" onclick="openModal('eval-modal')">
+          <div class="step-num">4</div>
+          <div class="step-info"><h4>Evaluate</h4><p>Score interview answers</p></div>
+        </div>
+        <div class="pipeline-step" onclick="openModal('compare-modal')">
+          <div class="step-num">5</div>
+          <div class="step-info"><h4>Compare</h4><p>Side-by-side ranking</p></div>
+        </div>
+        <div class="pipeline-step" onclick="openModal('report-modal')">
+          <div class="step-num">6</div>
+          <div class="step-info"><h4>Report</h4><p>Hiring recommendation</p></div>
+        </div>
+      </div>
+      <div id="pipeline-output" class="card">
+        <h3>Pipeline Output</h3>
+        <p class="meta">Click a pipeline step to execute it. Results appear here.</p>
+        <pre id="pipeline-result" style="font-size:0.8rem;white-space:pre-wrap;max-height:400px;overflow-y:auto;color:var(--text-secondary);"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCORES TAB -->
+  <div class="tab-content" id="tab-scores">
+    <h2 style="margin-bottom:20px;">Candidate Scores</h2>
+    <div id="scores-table-wrap"></div>
+  </div>
+
+  <!-- QUESTIONS TAB -->
+  <div class="tab-content" id="tab-questions">
+    <h2 style="margin-bottom:20px;">Interview Questions</h2>
+    <div id="questions-list"></div>
+  </div>
+
+  <!-- COMPARISONS TAB -->
+  <div class="tab-content" id="tab-comparisons">
+    <h2 style="margin-bottom:20px;">Candidate Comparisons</h2>
+    <div id="comparisons-list"></div>
+  </div>
+
+  <!-- REPORTS TAB -->
+  <div class="tab-content" id="tab-reports">
+    <h2 style="margin-bottom:20px;">Hiring Reports</h2>
+    <div id="reports-list"></div>
+  </div>
+
+  <!-- SYSTEM TAB -->
+  <div class="tab-content" id="tab-system">
+    <h2 style="margin-bottom:20px;">System Status</h2>
+    <div class="stat-grid" id="system-stats"></div>
+    <div id="agent-status" class="grid"></div>
+    <h3 style="margin:24px 0 12px;">Execution History</h3>
+    <div id="exec-history"></div>
+  </div>
+
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="add-candidate-modal">
+  <div class="modal">
+    <h2>Add Candidate</h2>
+    <form id="candidate-form">
+      <div class="form-group"><label>Name</label><input name="name" required></div>
+      <div class="form-group"><label>Email</label><input name="email" type="email"></div>
+      <div class="form-group"><label>Phone</label><input name="phone"></div>
+      <div class="form-group"><label>Resume Text</label><textarea name="resume_text" rows="6" placeholder="Paste resume content here..."></textarea></div>
+      <div style="display:flex;gap:8px;">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal('add-candidate-modal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="add-job-modal">
+  <div class="modal">
+    <h2>Add Job Position</h2>
+    <form id="job-form">
+      <div class="form-group"><label>Title</label><input name="title" required></div>
+      <div class="form-group"><label>Company</label><input name="company"></div>
+      <div class="form-group"><label>Description</label><textarea name="description" rows="3"></textarea></div>
+      <div class="form-group"><label>Required Skills (comma-separated)</label><input name="required_skills" placeholder="Python, FastAPI, SQL"></div>
+      <div class="form-group"><label>Preferred Skills (comma-separated)</label><input name="preferred_skills" placeholder="Docker, AWS"></div>
+      <div class="form-group"><label>Min Experience (years)</label><input name="min_experience" type="number" value="0"></div>
+      <div class="form-group"><label>Education Requirement</label><input name="education_requirement"></div>
+      <div class="form-group"><label>Salary Range</label><input name="salary_range" placeholder="$80k - $120k"></div>
+      <div style="display:flex;gap:8px;">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal('add-job-modal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="match-modal">
+  <div class="modal">
+    <h2>Match Candidate to Job</h2>
+    <div class="form-group"><label>Candidate ID</label><input id="match-cid" type="number"></div>
+    <div class="form-group"><label>Job ID</label><input id="match-jid" type="number"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="runMatch()">Run Match</button>
+      <button class="btn btn-outline" onclick="closeModal('match-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="score-modal">
+  <div class="modal">
+    <h2>Score Candidate</h2>
+    <div class="form-group"><label>Candidate ID</label><input id="score-cid" type="number"></div>
+    <div class="form-group"><label>Job ID</label><input id="score-jid" type="number"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="runScore()">Run Scoring</button>
+      <button class="btn btn-outline" onclick="closeModal('score-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="qgen-modal">
+  <div class="modal">
+    <h2>Generate Interview Questions</h2>
+    <div class="form-group"><label>Job ID</label><input id="qgen-jid" type="number"></div>
+    <div class="form-group"><label>Number of Questions</label><input id="qgen-count" type="number" value="10"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="runQGen()">Generate</button>
+      <button class="btn btn-outline" onclick="closeModal('qgen-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="eval-modal">
+  <div class="modal">
+    <h2>Evaluate Interview Answer</h2>
+    <div class="form-group"><label>Candidate ID</label><input id="eval-cid" type="number"></div>
+    <div class="form-group"><label>Question ID</label><input id="eval-qid" type="number"></div>
+    <div class="form-group"><label>Answer</label><textarea id="eval-answer" rows="4"></textarea></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="runEval()">Evaluate</button>
+      <button class="btn btn-outline" onclick="closeModal('eval-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="compare-modal">
+  <div class="modal">
+    <h2>Compare Candidates</h2>
+    <div class="form-group"><label>Job ID</label><input id="cmp-jid" type="number"></div>
+    <div class="form-group"><label>Candidate IDs (comma-separated)</label><input id="cmp-cids" placeholder="1, 2, 3"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="runCompare()">Compare</button>
+      <button class="btn btn-outline" onclick="closeModal('compare-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="report-modal">
+  <div class="modal">
+    <h2>Generate Hiring Report</h2>
+    <div class="form-group"><label>Job ID</label><input id="report-jid" type="number"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="runReport()">Generate Report</button>
+      <button class="btn btn-outline" onclick="closeModal('report-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    loadTabData(tab.dataset.tab);
+  });
+});
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = type === 'success' ? 'var(--success)' : 'var(--danger)';
+  t.style.color = type === 'success' ? 'var(--success)' : 'var(--danger)';
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+
+async function api(url, opts={}) {
+  const resp = await fetch(url, { headers: {'Content-Type':'application/json'}, ...opts });
+  return resp.json();
+}
+
+// Load data
+async function loadCandidates() {
+  const data = await api('/api/candidates');
+  const grid = document.getElementById('candidates-grid');
+  if (!data.candidates?.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">👤</div><p>No candidates yet. Add your first candidate.</p></div>';
+    return;
+  }
+  grid.innerHTML = data.candidates.map(c => `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:start;">
+        <h3>${c.name || 'Unnamed'}</h3>
+        <button class="btn btn-danger" style="padding:4px 8px;font-size:0.7rem;" onclick="deleteCandidate(${c.id})">×</button>
+      </div>
+      <div class="meta">${c.email || 'No email'} ${c.phone ? '· ' + c.phone : ''}</div>
+      <div class="meta">Experience: ${c.experience_years || 0} years</div>
+      <div style="margin-top:8px;">${(JSON.parse(c.skills||'[]')).slice(0,5).map(s => '<span class="badge badge-info" style="margin:2px;">' + s + '</span>').join(' ')}</div>
+    </div>
+  `).join('');
+}
+
+async function loadJobs() {
+  const data = await api('/api/jobs');
+  const grid = document.getElementById('jobs-grid');
+  if (!data.jobs?.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">💼</div><p>No jobs yet. Create a position to get started.</p></div>';
+    return;
+  }
+  grid.innerHTML = data.jobs.map(j => `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:start;">
+        <h3>${j.title}</h3>
+        <button class="btn btn-danger" style="padding:4px 8px;font-size:0.7rem;" onclick="deleteJob(${j.id})">×</button>
+      </div>
+      <div class="meta">${j.company || ''} · ID: ${j.id}</div>
+      <p style="font-size:0.85rem;margin:8px 0;color:var(--text-secondary);">${(j.description||'').substring(0,120)}${(j.description||'').length > 120 ? '...' : ''}</p>
+      <div style="margin-top:4px;">${(JSON.parse(j.required_skills||'[]')).map(s => '<span class="badge badge-accent" style="margin:2px;">' + s + '</span>').join(' ')}</div>
+      <div class="meta" style="margin-top:8px;">Min Exp: ${j.min_experience || 0}y · ${j.salary_range || 'No salary listed'}</div>
+    </div>
+  `).join('');
+}
+
+async function loadSystem() {
+  const data = await api('/api/status');
+  const stats = document.getElementById('system-stats');
+  const agents = Object.entries(data.agents || {});
+  stats.innerHTML = `
+    <div class="stat-card"><div class="value">${agents.length}</div><div class="label">Registered Agents</div></div>
+    <div class="stat-card"><div class="value">${data.started ? 'Running' : 'Stopped'}</div><div class="label">Kernel Status</div></div>
+    <div class="stat-card"><div class="value">${(data.history||[]).length}</div><div class="label">Total Executions</div></div>
+  `;
+  const agentDiv = document.getElementById('agent-status');
+  agentDiv.innerHTML = agents.map(([name, status]) => `
+    <div class="card">
+      <h3>${name}</h3>
+      <span class="badge ${status==='completed'?'badge-success':status==='running'?'badge-warning':status==='failed'?'badge-accent':'badge-info'}">${status}</span>
+    </div>
+  `).join('');
+  const hist = document.getElementById('exec-history');
+  const history = (data.history || []).reverse().slice(0, 20);
+  if (!history.length) { hist.innerHTML = '<p style="color:var(--text-secondary);">No executions yet.</p>'; return; }
+  hist.innerHTML = '<table><tr><th>Agent</th><th>Status</th><th>Time</th><th>When</th></tr>' +
+    history.map(h => `<tr><td>${h.agent}</td><td><span class="badge ${h.status==='completed'?'badge-success':'badge-accent'}">${h.status}</span></td><td>${h.elapsed_seconds?.toFixed(2)}s</td><td>${h.timestamp}</td></tr>`).join('') + '</table>';
+}
+
+async function loadScores() {
+  // Load all jobs first to show scores per job
+  const jobs = await api('/api/jobs');
+  const wrap = document.getElementById('scores-table-wrap');
+  if (!jobs.jobs?.length) { wrap.innerHTML = '<div class="empty-state"><div class="icon">📊</div><p>Create jobs and score candidates to see results.</p></div>'; return; }
+  let html = '';
+  for (const j of jobs.jobs.slice(0, 5)) {
+    const scores = await api(`/api/scores/${j.id}`);
+    if (scores.scores?.length) {
+      html += `<h3 style="margin:16px 0 8px;">${j.title} (ID: ${j.id})</h3>`;
+      html += '<table><tr><th>Candidate</th><th>Technical</th><th>Experience</th><th>Education</th><th>Cultural</th><th>Overall</th></tr>';
+      html += scores.scores.map(s => `<tr><td>${s.candidate_name}</td><td>${s.technical_score}</td><td>${s.experience_score}</td><td>${s.education_score}</td><td>${s.cultural_fit_score}</td><td><strong>${s.overall_score}</strong></td></tr>`).join('');
+      html += '</table>';
+    }
+  }
+  wrap.innerHTML = html || '<div class="empty-state"><div class="icon">📊</div><p>No scores yet. Run the scoring pipeline first.</p></div>';
+}
+
+async function loadQuestions() {
+  const jobs = await api('/api/jobs');
+  const list = document.getElementById('questions-list');
+  let html = '';
+  for (const j of (jobs.jobs||[]).slice(0, 3)) {
+    const qs = await api(`/api/questions/${j.id}`);
+    if (qs.questions?.length) {
+      html += `<h3 style="margin:16px 0 8px;">${j.title}</h3>`;
+      qs.questions.forEach(q => {
+        html += `<div class="card" style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;"><span class="badge badge-${q.category==='technical'?'info':'accent'}">${q.category}</span><span class="badge badge-warning">${q.difficulty}</span></div><p style="margin-top:8px;font-size:0.9rem;">${q.question_text}</p></div>`;
+      });
+    }
+  }
+  list.innerHTML = html || '<div class="empty-state"><div class="icon">❓</div><p>Generate questions from the Pipeline tab.</p></div>';
+}
+
+async function loadComparisons() {
+  const data = await api('/api/comparisons');
+  const list = document.getElementById('comparisons-list');
+  // We need a comparisons endpoint - for now use reports
+  list.innerHTML = '<div class="empty-state"><div class="icon">⚖️</div><p>Run comparisons from the Pipeline tab.</p></div>';
+}
+
+async function loadReports() {
+  const data = await api('/api/reports');
+  const list = document.getElementById('reports-list');
+  if (!data.reports?.length) { list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Generate reports from the Pipeline tab.</p></div>'; return; }
+  list.innerHTML = data.reports.map(r => {
+    const content = JSON.parse(r.content || '{}');
+    return `<div class="card" style="margin-bottom:12px;"><h3>${content.title || 'Report #' + r.id}</h3><div class="meta">Job ID: ${r.job_id} · ${r.created_at}</div><p style="font-size:0.85rem;margin-top:8px;color:var(--text-secondary);">${content.executive_summary || 'No summary available.'}</p><span class="badge badge-accent" style="margin-top:8px;">Confidence: ${content.confidence_level || 'N/A'}</span></div>`;
+  }).join('');
+}
+
+function loadTabData(tab) {
+  const loaders = { candidates: loadCandidates, jobs: loadJobs, system: loadSystem, scores: loadScores, questions: loadQuestions, comparisons: loadComparisons, reports: loadReports };
+  loaders[tab]?.();
+}
+
+// Forms
+document.getElementById('candidate-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const resp = await fetch('/api/candidates', { method: 'POST', body: fd });
+  const data = await resp.json();
+  closeModal('add-candidate-modal');
+  showToast(`Candidate "${data.name}" created (ID: ${data.id})`);
+  e.target.reset();
+  loadCandidates();
+});
+
+document.getElementById('job-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const body = {};
+  fd.forEach((v, k) => {
+    if (k === 'required_skills' || k === 'preferred_skills') body[k] = v.split(',').map(s => s.trim()).filter(Boolean);
+    else if (k === 'min_experience') body[k] = parseFloat(v) || 0;
+    else body[k] = v;
+  });
+  const data = await api('/api/jobs', { method: 'POST', body: JSON.stringify(body) });
+  closeModal('add-job-modal');
+  showToast(`Job created (ID: ${data.id})`);
+  e.target.reset();
+  loadJobs();
+});
+
+async function deleteCandidate(id) { await fetch(`/api/candidates/${id}`, {method:'DELETE'}); loadCandidates(); showToast('Candidate deleted'); }
+async function deleteJob(id) { await fetch(`/api/jobs/${id}`, {method:'DELETE'}); loadJobs(); showToast('Job deleted'); }
+
+// Pipeline actions
+function showPipelineResult(data) {
+  document.getElementById('pipeline-result').textContent = JSON.stringify(data, null, 2);
+}
+
+async function runMatch() {
+  const cid = parseInt(document.getElementById('match-cid').value);
+  const jid = parseInt(document.getElementById('match-jid').value);
+  closeModal('match-modal');
+  showPipelineResult({status: 'running...'});
+  const data = await api('/api/match', { method: 'POST', body: JSON.stringify({candidate_id: cid, job_id: jid}) });
+  showPipelineResult(data);
+  showToast(data.match ? 'Match complete!' : 'Match failed', data.match ? 'success' : 'danger');
+}
+
+async function runScore() {
+  const cid = parseInt(document.getElementById('score-cid').value);
+  const jid = parseInt(document.getElementById('score-jid').value);
+  closeModal('score-modal');
+  showPipelineResult({status: 'scoring...'});
+  const data = await api('/api/score', { method: 'POST', body: JSON.stringify({candidate_id: cid, job_id: jid}) });
+  showPipelineResult(data);
+  showToast(data.scores ? 'Scoring complete!' : 'Scoring failed', data.scores ? 'success' : 'danger');
+}
+
+async function runQGen() {
+  const jid = parseInt(document.getElementById('qgen-jid').value);
+  const count = parseInt(document.getElementById('qgen-count').value) || 10;
+  closeModal('qgen-modal');
+  showPipelineResult({status: 'generating...'});
+  const data = await api('/api/questions/generate', { method: 'POST', body: JSON.stringify({job_id: jid, count}) });
+  showPipelineResult(data);
+  showToast(`Generated ${data.count || 0} questions!`);
+}
+
+async function runEval() {
+  const cid = parseInt(document.getElementById('eval-cid').value);
+  const qid = parseInt(document.getElementById('eval-qid').value);
+  const answer = document.getElementById('eval-answer').value;
+  closeModal('eval-modal');
+  showPipelineResult({status: 'evaluating...'});
+  const data = await api('/api/evaluate', { method: 'POST', body: JSON.stringify({candidate_id: cid, question_id: qid, answer}) });
+  showPipelineResult(data);
+  showToast(data.evaluation ? 'Evaluation complete!' : 'Evaluation failed', data.evaluation ? 'success' : 'danger');
+}
+
+async function runCompare() {
+  const jid = parseInt(document.getElementById('cmp-jid').value);
+  const cids = document.getElementById('cmp-cids').value.split(',').map(s => parseInt(s.trim())).filter(Boolean);
+  closeModal('compare-modal');
+  showPipelineResult({status: 'comparing...'});
+  const data = await api('/api/compare', { method: 'POST', body: JSON.stringify({job_id: jid, candidate_ids: cids}) });
+  showPipelineResult(data);
+  showToast(data.comparison ? 'Comparison complete!' : 'Comparison failed', data.comparison ? 'success' : 'danger');
+}
+
+async function runReport() {
+  const jid = parseInt(document.getElementById('report-jid').value);
+  closeModal('report-modal');
+  showPipelineResult({status: 'generating report...'});
+  const data = await api('/api/reports/generate', { method: 'POST', body: JSON.stringify({job_id: jid}) });
+  showPipelineResult(data);
+  showToast(data.report ? 'Report generated!' : 'Report failed', data.report ? 'success' : 'danger');
+}
+
+// WebSocket
+let ws;
+function connectWS() {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${proto}//${location.host}/ws`);
+  ws.onopen = () => { document.getElementById('ws-status').textContent = 'Connected'; };
+  ws.onclose = () => { document.getElementById('ws-status').textContent = 'Disconnected'; setTimeout(connectWS, 3000); };
+  ws.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'status') loadSystem();
+  };
+}
+connectWS();
+
+// Initial load
+loadCandidates();
+</script>
+</body>
+</html>
