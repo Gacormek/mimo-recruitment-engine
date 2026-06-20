@@ -11,7 +11,7 @@ DATABASE_PATH = DATA_DIR / "recruitment.db"
 # MiMo LLM
 MIMO_API_URL = os.getenv("MIMO_API_URL")
 MIMO_MODEL = os.getenv("MIMO_MODEL", "xmtp/mimo-v2.5-pro")
-MIMO_API_KEY = os.getenv("MIMO_API_KEY", "sk-hermes-mimo")
+MIMO_API_KEY = os.getenv("MIMO_API_KEY")
 
 # Server
 HOST = os.getenv("HOST", "0.0.0.0")
