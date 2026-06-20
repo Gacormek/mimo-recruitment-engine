@@ -9,7 +9,7 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 DATABASE_PATH = DATA_DIR / "recruitment.db"
 
 # MiMo LLM
-MIMO_API_URL = os.getenv("MIMO_API_URL", "http://43.153.206.68:20128/v1")
+MIMO_API_URL = os.getenv("MIMO_API_URL")
 MIMO_MODEL = os.getenv("MIMO_MODEL", "xmtp/mimo-v2.5-pro")
 MIMO_API_KEY = os.getenv("MIMO_API_KEY", "sk-hermes-mimo")
 

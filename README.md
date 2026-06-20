@@ -37,7 +37,7 @@ An intelligent hiring system powered by the MiMo LLM that automates the full rec
 │                              │                                       │
 │  ┌───────────────────────────┴───────────────────────────────────┐  │
 │  │              MiMo LLM (xmtp/mimo-v2.5-pro)                   │  │
-│  │         Endpoint: http://43.153.206.68:20128/v1               │  │
+│  │         Endpoint: http://your-mimo-server:20128/v1               │  │
 │  └───────────────────────────────────────────────────────────────┘  │
 │                              │                                       │
 │  ┌───────────────────────────┴───────────────────────────────────┐  │
@@ -145,7 +145,7 @@ Then open http://localhost:8000
 
 The engine uses the MiMo LLM (`xmtp/mimo-v2.5-pro`) for all AI operations:
 
-- **Endpoint**: `http://43.153.206.68:20128/v1`
+- **Endpoint**: `http://your-mimo-server:20128/v1`
 - **Model**: `xmtp/mimo-v2.5-pro`
 - **API Key**: `sk-hermes-mimo`
 
